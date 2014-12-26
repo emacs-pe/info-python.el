@@ -1,0 +1,8 @@
+*~
+*.elc
+*.info
+.cask
+elpa
+make-readme-markdown.el
+/cpython-*/
+/dir
