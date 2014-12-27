@@ -60,10 +60,8 @@
          (exec-path (python-shell-calculate-exec-path))
          (python-exec (executable-find python-shell-interpreter))
          (python-args "-c \"import sys; sys.stdout.write('%s.%s' % (sys.version_info[0], sys.version_info[1]))\"")
-         (python-version (shell-command-to-string (format "%s %s" python-exec python-args))))
-    (if (= (length python-version) 3)
-        python-version
-      (error python-version))))
+         (output (shell-command-to-string (format "%s %s" python-exec python-args))))
+    (if (= (length output) 3) output (error output))))   ;;; YOLO
 
 ;;;###autoload
 (defun info-python-update (&optional maybe)

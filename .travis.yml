@@ -1,11 +1,12 @@
+# py26,py31,py32 use an outdated version of Sphinx (<1.1)
+# which doesn't include the texinfo builder.
+
 language: python
 before_install:
-  - sudo apt-get install texinfo
-  - pip install -U "sphinx>=1.1"
-script: bash -ex build.sh
+  - sudo apt-get -qq install texinfo
+  - pip install -r requirements.txt
+script: make PYTHON_VERSION="$TRAVIS_PYTHON_VERSION" python.info
 python:
-  - "2.6"
   - "2.7"
-  - "3.2"
   - "3.3"
   - "3.4"

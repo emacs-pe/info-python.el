@@ -7,6 +7,8 @@ BATCHC = $(BATCH) -f batch-byte-compile
 ELS  = info-python.el
 ELCS = $(ELS:.el=.elc)
 
+PYTHON_VERSION =
+
 .PHONY: all
 all: install README.md
 
@@ -17,7 +19,7 @@ elpa: Cask
 	$(CASK) install
 	touch $@
 
-build-info:
+python.info:
 	./build.sh
 
 %.elc: %.el
