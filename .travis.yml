@@ -5,8 +5,8 @@ language: python
 before_install:
   - sudo apt-get -qq install texinfo
   - pip install -r requirements.txt
-script: make PYTHON_VERSION="$TRAVIS_PYTHON_VERSION" python.info
-python:
-  - "2.7"
-  - "3.3"
-  - "3.4"
+script: make PYTHON_VERSION="$PYTHON_VERSION" python.info
+env:
+  - PYTHON_VERSION="2.7"
+  - PYTHON_VERSION="3.3"
+  - PYTHON_VERSION="3.4"
