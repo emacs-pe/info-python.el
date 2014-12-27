@@ -10,3 +10,12 @@ env:
   - PYTHON_VERSION="2.7"
   - PYTHON_VERSION="3.3"
   - PYTHON_VERSION="3.4"
+deploy:
+  provider: releases
+  api_key:
+    secure: UYiDGXXD4qFN2eXqI2mm290Oqj2DtN56meW1dYJ/nHKf6mdIV03lG24m6cvUjty/EOVjozSDTJVImzmnnPfC9r8KCHuCt8cylXeBRJLXx2IoeTXstVNZ2IBr9814DBxQUuGC83TTKHbWf/4lnJUuCPyri2T2u/ldV46ojHrPgGY=
+  file: "python-${PYTHON_VERSION}.info"
+  skip_cleanup: true
+  on:
+    tags: true
+    all_branches: true
