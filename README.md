@@ -4,30 +4,71 @@
 ---
 [![Travis build status](https://travis-ci.org/emacs-pe/info-python.el.png?branch=master)](https://travis-ci.org/emacs-pe/info-python.el)
 
-Currently uses sphinx [texinfo builder][] to build the texinfo.
+`info-python` provides navigation and search of the info version of
+the [Python Library Reference][] documentation.
 
 ### Setup
 
-Add to your `init.el` the following:
+Choose an info file for your python version from the releases page:
+https://github.com/emacs-pe/info-python.el/releases and install it
+somewhere in your INFOPATH:
+
+    $ sudo cp python-2.7.info /usr/share/info
+    $ sudo install-info --info-dir=/usr/share/info python-2.7.info
+
+Dump `info-python.el` in your `load-path` somewhere, and add the
+following code to your `user-init-file` (init.el):
 
     (require 'info-python)
-    (info-python-update)
 
-### TODO
+    ;; remember to use the complete info filename.
+    (eval-after-load "info-python"
+      '(info-python-load "python-2.7.info"))
 
-+ [ ] Improve function to update `info-lookup-alist`
-      + Support python submodules.
-+ [ ] Add support for different python versions.
-+ [ ] Add support for python virtualenv.
+### Related Projects
+
++ [pydoc-info](https://bitbucket.org/jonwaltman/pydoc-info/).
+
+  Besides the intallation of the info files, (I think) you can use
+  `pydoc-info` and `info-python` interchangeably.  **Disclaimer**:
+  I actually found this project after I wrote the basis of this
+  package.
+
+### Features
+
++ `info-lookup-symbol` (C-h S) support for python mode.
+
+### Build info
+
+Currently uses Sphinx [texinfo builder][] to create the info
+file. The build script **doesn't check the minor version of
+python** and can build the info documentation for Python>2.5:
+
+1. Clone https://github.com/emacs-pe/info-python.el
+
+2. Install Sphinx:
+
+        $ pip install -U 'Sphinx>=1.1'
+
+3. For Python **without minor version** (e.g "3.2"):
+
+        $ make PYTHON_VERSION=3.2 dist
+
+   For Python **with the minor version** (e.g "2.7.1"), You need to
+   modify the url of Makefile to download the sources from the Python
+   website, and build it through:
+
+        $ make PYTHON_VERSION=2.7.1 dist
 
 [texinfo builder]: http://sphinx-doc.org/builders.html#module-sphinx.builders.texinfo
+[Python Library Reference]: https://docs.python.org/library/
 
 ### Function Documentation
 
 
-#### `(info-python-update &optional MAYBE)`
+#### `(info-python-load INFO)`
 
-Load info to `info-lookup-alist`
+Load python INFO to `info-lookup-alist`.
 
 -----
 <div style="padding-top:15px;color: #d0d0d0;">
