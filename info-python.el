@@ -31,6 +31,9 @@
 ;; `info-python' provides navigation and search of the info version of
 ;; the [Python Library Reference][] documentation.
 ;;
+;;; Features:
+;; + `info-lookup-symbol': `C-h S` support for `python.el'.
+;;
 ;;; Setup:
 ;; Choose an info file for your python version from the releases page:
 ;; https://github.com/emacs-pe/info-python.el/releases and install it
@@ -56,9 +59,6 @@
 ;;   I actually found this project after I wrote the basis of this
 ;;   package.
 ;;
-;;; Features:
-;; + `info-lookup-symbol' (C-h S) support for python mode.
-;;
 ;;; Build info:
 ;; Currently uses Sphinx [texinfo builder][] to create the info
 ;; file. The build script **doesn't check the minor version of
@@ -70,15 +70,9 @@
 ;;
 ;;         $ pip install -U 'Sphinx>=1.1'
 ;;
-;; 3. For Python **without minor version** (e.g "3.2"):
+;; 3. Build texinfo file:
 ;;
 ;;         $ make PYTHON_VERSION=3.2 dist
-;;
-;;    For Python **with the minor version** (e.g "2.7.1"), You need to
-;;    modify the url of Makefile to download the sources from the Python
-;;    website, and build it through:
-;;
-;;         $ make PYTHON_VERSION=2.7.1 dist
 ;;
 ;; [texinfo builder]: http://sphinx-doc.org/builders.html#module-sphinx.builders.texinfo
 ;; [Python Library Reference]: https://docs.python.org/library/
@@ -86,7 +80,6 @@
 ;;; Code:
 
 (require 'info-look)
-(require 'python)
 
 ;;; Shamelessly based on `pydoc-info' transform entry function.
 (defun info-python--lookup-transform-entry (item)
@@ -134,14 +127,19 @@
      (t
       item))))
 
-(defun info-python-load (info)
-  "Load python INFO to `info-lookup-alist'."
+(defun info-python--doc-spec (info)
+  "Generate a single python doc-spec for an INFO document."
+  `((,(format "(%s)Index" info) info-python--lookup-transform-entry)
+    (,(format "(%s)Python Module Index" info) info-python--lookup-transform-entry)))
+
+(defun info-python-load (&rest info-files)
+  "Load python INFO-FILES to `info-lookup-alist'."
   (info-lookup-reset)
-  (info-lookup-add-help :mode 'python-mode
-			:parse-rule 'python-info-current-symbol
-			:doc-spec (list
-				   (list (format "(%s)Index" info) 'info-python--lookup-transform-entry)
-				   (list (format "(%s)Python Module Index" info) 'info-python--lookup-transform-entry))))
+  (let ((doc-spec (apply #'append
+                         (mapcar #'info-python--doc-spec info-files))))
+    (info-lookup-add-help :mode 'python-mode
+                          :parse-rule 'python-info-current-symbol
+                          :doc-spec doc-spec)))
 
 (provide 'info-python)
 

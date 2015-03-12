@@ -9,8 +9,15 @@ BATCHC      = $(BATCH) -f batch-byte-compile
 ELS  = info-python.el
 ELCS = $(ELS:.el=.elc)
 
-PYTHON_VERSION = $(shell $(PYTHON) -c "import sys; sys.stdout.write('%s.%s' % (sys.version_info[0], sys.version_info[1]))")
-PYTHON_SRCDIR  = cpython-$(PYTHON_VERSION)
+PYTHON_VERSION := $(shell $(PYTHON) -c "import sys; sys.stdout.write('%s.%s' % (sys.version_info[0], sys.version_info[1]))")
+
+ifeq ($(words $(subst ., ,$(PYTHON_VERSION))),3)
+  TARGZ_URL     = "https://www.python.org/ftp/python/$(PYTHON_VERSION)/Python-$(PYTHON_VERSION).tgz"
+  PYTHON_SRCDIR = Python-$(PYTHON_VERSION)
+else
+  TARGZ_URL     = "https://github.com/python/cpython/archive/$(PYTHON_VERSION).tar.gz"
+  PYTHON_SRCDIR = cpython-$(PYTHON_VERSION)
+endif
 
 BUILD_DIR = build
 TEXI_DIST = $(BUILD_DIR)/python-$(PYTHON_VERSION).texi
@@ -36,7 +43,7 @@ $(TEXI_DIST): $(PYTHON_VERSION).stamp
 	$(SPHINXBUILD) -c . -b texinfo -d $(BUILD_DIR)/$(PYTHON_VERSION).doctrees $(PYTHON_SRCDIR)/Doc $(BUILD_DIR)
 
 $(PYTHON_VERSION).stamp:
-	wget -O- "https://github.com/python/cpython/archive/$(PYTHON_VERSION).tar.gz" | tar xz
+	wget -O- $(TARGZ_URL) | tar xz
 	touch $@
 
 %.info: %.texi

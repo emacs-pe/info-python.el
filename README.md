@@ -7,6 +7,10 @@
 `info-python` provides navigation and search of the info version of
 the [Python Library Reference][] documentation.
 
+### Features
+
++ `info-lookup-symbol`: `C-h S` support for `python.el`.
+
 ### Setup
 
 Choose an info file for your python version from the releases page:
@@ -34,10 +38,6 @@ following code to your `user-init-file` (init.el):
   I actually found this project after I wrote the basis of this
   package.
 
-### Features
-
-+ `info-lookup-symbol` (C-h S) support for python mode.
-
 ### Build info
 
 Currently uses Sphinx [texinfo builder][] to create the info
@@ -50,15 +50,9 @@ python** and can build the info documentation for Python>2.5:
 
         $ pip install -U 'Sphinx>=1.1'
 
-3. For Python **without minor version** (e.g "3.2"):
+3. Build texinfo file:
 
         $ make PYTHON_VERSION=3.2 dist
-
-   For Python **with the minor version** (e.g "2.7.1"), You need to
-   modify the url of Makefile to download the sources from the Python
-   website, and build it through:
-
-        $ make PYTHON_VERSION=2.7.1 dist
 
 [texinfo builder]: http://sphinx-doc.org/builders.html#module-sphinx.builders.texinfo
 [Python Library Reference]: https://docs.python.org/library/
@@ -66,9 +60,9 @@ python** and can build the info documentation for Python>2.5:
 ### Function Documentation
 
 
-#### `(info-python-load INFO)`
+#### `(info-python-load &rest INFO-FILES)`
 
-Load python INFO to `info-lookup-alist`.
+Load python INFO-FILES to `info-lookup-alist`.
 
 -----
 <div style="padding-top:15px;color: #d0d0d0;">

@@ -2,7 +2,7 @@ language: python
 before_install:
   - sudo apt-get -qq update
   - sudo apt-get -qq install texinfo
-  - pip install -U -r requirements.txt
+  - sudo pip install -U "Sphinx>=1.1"
 script: make PYTHON_VERSION="$PYTHON_VERSION" dist
 env:
   - PYTHON_VERSION="2.6"
