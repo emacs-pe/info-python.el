@@ -4,7 +4,7 @@ addons:
     sources:
       - cassou-emacs
     packages:
-      - emacs
+      - emacs24
       - texinfo
 before_install:
   - curl -fsSL https://github.com/cask/cask/raw/master/go | python
