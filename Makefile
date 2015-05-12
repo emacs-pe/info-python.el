@@ -19,7 +19,7 @@ else
   PYTHON_SRCDIR = cpython-$(PYTHON_VERSION)
 endif
 
-BUILD_DIR = build
+BUILD_DIR = doc
 TEXI_DIST = $(BUILD_DIR)/python-$(PYTHON_VERSION).texi
 INFO_DIST = $(TEXI_DIST:.texi=.info)
 
@@ -52,13 +52,13 @@ $(PYTHON_VERSION).stamp:
 %.elc: %.el
 	$(CASK) exec $(BATCHC) $<
 
-README.md: make-readme-markdown.el $(ELS)
-	$(CASK) exec $(BATCH) --script $< <$(ELS) >$@ 2>/dev/null
+README.md: el2markdown.el $(ELS)
+	$(CASK) exec $(BATCH) -l $< $(ELS) -f el2markdown-write-readme
 
-make-readme-markdown.el:
-	$(WGET) -q -O $@ "https://raw.github.com/mgalgs/make-readme-markdown/master/make-readme-markdown.el"
+el2markdown.el:
+	$(WGET) -q -O $@ "https://github.com/Lindydancer/el2markdown/raw/master/el2markdown.el"
 
-.INTERMEDIATE: make-readme-markdown.el
+.INTERMEDIATE: el2markdown.el
 
 clean:
 	$(RM) $(ELCS)

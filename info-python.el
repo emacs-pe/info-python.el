@@ -1,12 +1,12 @@
 ;;; info-python.el --- Info support for the Python Standard Library. -*- lexical-binding: t -*-
 
-;; Copyright © 2014 Mario Rodas <marsam@users.noreply.github.com>
+;; Copyright (C) 2014 Mario Rodas <marsam@users.noreply.github.com>
 
 ;; Author: Mario Rodas <marsam@users.noreply.github.com>
 ;; URL: https://github.com/emacs-pe/info-python.el
 ;; Keywords: convenience
 ;; Version: 0.0.1
-;; Package-Requires: ((emacs "24"))
+;; Package-Requires: ()
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -31,11 +31,29 @@
 ;; `info-python' provides navigation and search of the info version of
 ;; the [Python Library Reference][] documentation.
 ;;
-;;; Features:
-;; + `info-lookup-symbol': `C-h S` support for `python.el'.
+;; Features:
 ;;
-;;; Setup:
-;; Choose an info file for your python version from the releases page:
+;; + `info-lookup-symbol': <kbd>C-h S</kbd> support for `python.el'.
+
+;; Installation:
+;;
+;; Using `package.el' (recommended):
+;;
+;; You need to add emacs-pe archive to your `package-archives':
+;;
+;;    (add-to-list 'package-archives
+;;                 '("emacs-pe" . "https://emacs-pe.github.io/packages/"))
+;;
+;; and install it trough `M-x package-install RET info-python`.
+;; Or through [use-package][]:
+;;
+;;    (use-package info-python
+;;     :ensure t
+;;     :pin emacs-pe)
+;;
+;; Manually:
+;;
+;; You need to download the info files from
 ;; https://github.com/emacs-pe/info-python.el/releases and install it
 ;; somewhere in your INFOPATH:
 ;;
@@ -43,26 +61,25 @@
 ;;     $ sudo install-info --info-dir=/usr/share/info python-2.7.info
 ;;
 ;; Dump `info-python.el' in your `load-path' somewhere, and add the
-;; following code to your `user-init-file' (init.el):
+;; following code to your init.el:
 ;;
-;;     (require 'info-python)
+;;    (require 'info-python)
+;;    ;; Add your installed info files for `python.el'
+;;    (info-python-load "python-2.7.info" "django.info" "flycheck")
+
+;; Related Projects:
 ;;
-;;     ;; remember to use the complete info filename.
-;;     (eval-after-load "info-python"
-;;       '(info-python-load "python-2.7.info"))
-;;
-;;; Related Projects:
 ;; + [pydoc-info](https://bitbucket.org/jonwaltman/pydoc-info/).
 ;;
 ;;   Besides the intallation of the info files, (I think) you can use
 ;;   `pydoc-info' and `info-python' interchangeably.  **Disclaimer**:
 ;;   I actually found this project after I wrote the basis of this
 ;;   package.
+
+;; Build texinfo:
 ;;
-;;; Build info:
-;; Currently uses Sphinx [texinfo builder][] to create the info
-;; file. The build script **doesn't check the minor version of
-;; python** and can build the info documentation for Python>2.5:
+;; Currently uses Sphinx [texinfo builder][] to create the texinfo
+;; file and can build the info documentation for Python >= 2.6:
 ;;
 ;; 1. Clone https://github.com/emacs-pe/info-python.el
 ;;
@@ -74,9 +91,10 @@
 ;;
 ;;         $ make PYTHON_VERSION=3.2 dist
 ;;
+;; [use-package]: https://github.com/jwiegley/use-package "A use-package declaration for simplifying your .emacs"
 ;; [texinfo builder]: http://sphinx-doc.org/builders.html#module-sphinx.builders.texinfo
-;; [Python Library Reference]: https://docs.python.org/library/
-;;
+;; [Python Library Reference]: https://docs.python.org/library/ "The Python Library Reference"
+
 ;;; Code:
 
 (require 'info-look)
@@ -132,14 +150,22 @@
   `((,(format "(%s)Index" info) info-python--lookup-transform-entry)
     (,(format "(%s)Python Module Index" info) info-python--lookup-transform-entry)))
 
+(defun info-python--gen-doc-specs (&rest info-files)
+  "Generate info-doc spec from INFO-FILES."
+  (apply 'append (mapcar #'info-python--doc-spec info-files)))
+
 (defun info-python-load (&rest info-files)
   "Load python INFO-FILES to `info-lookup-alist'."
   (info-lookup-reset)
-  (let ((doc-spec (apply #'append
-                         (mapcar #'info-python--doc-spec info-files))))
-    (info-lookup-add-help :mode 'python-mode
-                          :parse-rule 'python-info-current-symbol
-                          :doc-spec doc-spec)))
+  (info-lookup-add-help :mode 'python-mode
+                        :parse-rule 'python-info-current-symbol
+                        :doc-spec (info-python--gen-doc-specs info-files)))
+
+(info-lookup-maybe-add-help
+ :mode 'python-mode
+ :parse-rule 'python-info-current-symbol
+ :doc-spec (info-python--gen-doc-specs "python-2.7.info" "python-3.4.info")
+ :other-modes '(inferior-python-mode))
 
 (provide 'info-python)
 

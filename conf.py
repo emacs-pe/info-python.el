@@ -19,7 +19,14 @@ today_fmt = '%B %d, %Y'
 refcount_file = 'data/refcounts.dat'
 python_version = os.getenv('PYTHON_VERSION', '%s.%s' % (sys.version_info[0], sys.version_info[1]))
 texinfo_documents = [
-    ('library/index', 'python-%s' % python_version, 'The Python Library Reference', _stdauthor, 'Python', 'The Python Standard Library', 'Programming', True),
+    ('library/index',                                 # startdocname
+     'python-%s' % python_version,                    # targetname
+     'Python %s Library Reference' % python_version,  # title
+     _stdauthor,                                      # author
+     'Python %s' % python_version,                    # dir_entry
+     'The Python Standard Library',                   # description
+     'Programming',                                   # category
+     True),                                           # toctree_only
 ]
 texinfo_appendices = [
     'glossary',

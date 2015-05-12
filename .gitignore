@@ -5,8 +5,10 @@
 *.stamp
 .cask
 elpa
-make-readme-markdown.el
+el2markdown.el
 /cpython-*/
 /Python-*/
-/build/*
-!.gitkeep
+/dist/
+/doc/*.png
+/doc/*.doctrees
+/doc/Makefile

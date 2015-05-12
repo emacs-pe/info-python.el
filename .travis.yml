@@ -1,9 +1,19 @@
 language: python
+addons:
+  apt:
+    sources:
+      - cassou-emacs
+    packages:
+      - emacs
+      - texinfo
 before_install:
-  - sudo apt-get -qq update
-  - sudo apt-get -qq install texinfo
-  - sudo pip install -U "Sphinx>=1.1"
-script: make PYTHON_VERSION="$PYTHON_VERSION" dist
+  - curl -fsSL https://github.com/cask/cask/raw/master/go | python
+  - export PATH="$HOME/.cask/bin:$PATH"
+  - pip install -U "Sphinx>=1.1"
+install:
+  - make install
+script:
+  - make PYTHON_VERSION="$PYTHON_VERSION" dist
 env:
   - PYTHON_VERSION="2.6"
   - PYTHON_VERSION="2.7"
@@ -15,7 +25,9 @@ deploy:
   provider: releases
   api_key:
     secure: UYiDGXXD4qFN2eXqI2mm290Oqj2DtN56meW1dYJ/nHKf6mdIV03lG24m6cvUjty/EOVjozSDTJVImzmnnPfC9r8KCHuCt8cylXeBRJLXx2IoeTXstVNZ2IBr9814DBxQUuGC83TTKHbWf/4lnJUuCPyri2T2u/ldV46ojHrPgGY=
-  file: "build/python-${PYTHON_VERSION}.info"
+  file:
+    - "doc/python-${PYTHON_VERSION}.texi"
+    - "doc/python-${PYTHON_VERSION}.info"
   skip_cleanup: true
   on:
     tags: true
