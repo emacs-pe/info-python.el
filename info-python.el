@@ -1,4 +1,4 @@
-;;; info-python.el --- Info support for the Python Standard Library. -*- lexical-binding: t -*-
+;;; info-python.el --- Info support for Python Documentation  -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2014 Mario Rodas <marsam@users.noreply.github.com>
 
@@ -26,8 +26,7 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Commentary:
-;; [![Travis build status](https://travis-ci.org/emacs-pe/info-python.el.png?branch=master)](https://travis-ci.org/emacs-pe/info-python.el)
-;;
+
 ;; `info-python' provides navigation and search of the info version of
 ;; the [Python Library Reference][] documentation.
 ;;
@@ -99,6 +98,17 @@
 
 (require 'info-look)
 
+(defgroup info-python nil
+  "Info support for Python Documentation."
+  :prefix "info-python-"
+  :group 'info-lookup)
+
+;;;###autoload
+(defcustom info-python-files '("python-3.5.0.info" "python-2.7.10.info")
+  "List of files to add info-lookup for python mode."
+  :type '(repeat file)
+  :group 'info-python)
+
 ;;; Shamelessly based on `pydoc-info' transform entry function.
 (defun info-python--lookup-transform-entry (item)
   "Transform a Python index entry to a help ITEM."
@@ -150,22 +160,25 @@
   `((,(format "(%s)Index" info) info-python--lookup-transform-entry)
     (,(format "(%s)Python Module Index" info) info-python--lookup-transform-entry)))
 
-(defun info-python--gen-doc-specs (&rest info-files)
-  "Generate info-doc spec from INFO-FILES."
-  (apply 'append (mapcar #'info-python--doc-spec info-files)))
+;;;###autoload
+(defun info-python-load (&optional arg)
+  "Add or update the help specification for Python with `info-python-files'.
 
-(defun info-python-load (&rest info-files)
-  "Load python INFO-FILES to `info-lookup-alist'."
-  (info-lookup-reset)
-  (info-lookup-add-help :mode 'python-mode
-                        :parse-rule 'python-info-current-symbol
-                        :doc-spec (info-python--gen-doc-specs info-files)))
+If ARG is non-nil overwrites the help specification if defined."
+  (interactive "P")
+  (if info-python-files
+      (info-lookup-add-help* (not arg)
+                             :mode 'python-mode
+                             :parse-rule 'python-info-current-symbol
+                             :doc-spec (apply 'append (mapcar #'info-python--doc-spec info-python-files))
+                             :other-modes '(inferior-python-mode))
+    (user-error "No info files defined")))
 
-(info-lookup-maybe-add-help
- :mode 'python-mode
- :parse-rule 'python-info-current-symbol
- :doc-spec (info-python--gen-doc-specs "python-2.7.info" "python-3.4.info")
- :other-modes '(inferior-python-mode))
+(declare-function python-info-current-symbol "python")
+
+;;;###autoload
+(eval-after-load 'info
+  '(info-python-load))
 
 (provide 'info-python)
 

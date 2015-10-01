@@ -1,9 +1,7 @@
-# info-python - Info support for the Python Standard Library. -*- lexical-binding: t -*-
+# info-python - Info support for Python Documentation
 
 *Author:* Mario Rodas <marsam@users.noreply.github.com><br>
 *Version:* 0.0.1<br>
-
-[![Travis build status](https://travis-ci.org/emacs-pe/info-python.el.png?branch=master)](https://travis-ci.org/emacs-pe/info-python.el)
 
 `info-python` provides navigation and search of the info version of
 the [Python Library Reference][] documentation.

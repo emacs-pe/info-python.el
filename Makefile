@@ -1,13 +1,18 @@
 CASK       ?= cask
-WGET       ?= wget
-EMACS      ?= emacs
-PYTHON     ?= python
+CURL       ?= curl
+EMACS       = emacs
+PYTHON      = python
 SPHINXBUILD = sphinx-build
-BATCH       = $(EMACS) --batch -Q -L .
-BATCHC      = $(BATCH) -f batch-byte-compile
 
-ELS  = info-python.el
-ELCS = $(ELS:.el=.elc)
+EMACSFLAGS =
+EMACSBATCH = $(EMACS) --batch -Q $(EMACSFLAGS)
+
+
+export EMACS
+export PYTHONPATH
+
+SRCS  = info-python.el
+OBJS  = $(SRCS:.el=.elc)
 
 PYTHON_VERSION := $(shell $(PYTHON) -c "import sys; sys.stdout.write('%s.%s' % (sys.version_info[0], sys.version_info[1]))")
 
@@ -23,45 +28,43 @@ BUILD_DIR = doc
 TEXI_DIST = $(BUILD_DIR)/python-$(PYTHON_VERSION).texi
 INFO_DIST = $(TEXI_DIST:.texi=.info)
 
-export PYTHONPATH
+.PHONY: all texi info compile
+all: compile README.md
 
-.PHONY: all
-all: install README.md
+compile: $(OBJS)
 
-.PHONY: dist
-dist: $(INFO_DIST)
+%.elc: %.el $(PKGDIR)
+	$(CASK) exec $(EMACSBATCH) -f batch-byte-compile $<
 
-.PHONY: install
-install: elpa $(ELCS)
-
-elpa: Cask
+$(PKGDIR): Cask
 	$(CASK) install
-	touch $@
+	touch $(PKGDIR)
+
+dist: info
+texi: $(TEXI_DIST)
+info: $(INFO_DIST)
 
 $(TEXI_DIST): PYTHONPATH=$(PYTHON_SRCDIR)/Doc/tools/extensions:$(PYTHON_SRCDIR)/Doc/tools/sphinxext
 $(TEXI_DIST): $(PYTHON_VERSION).stamp
 	$(SPHINXBUILD) -c . -b texinfo -d $(BUILD_DIR)/$(PYTHON_VERSION).doctrees $(PYTHON_SRCDIR)/Doc $(BUILD_DIR)
 
 $(PYTHON_VERSION).stamp:
-	wget -O- $(TARGZ_URL) | tar xz
+	$(CURL) -sSL $(TARGZ_URL) | tar xz
 	touch $@
 
 %.info: %.texi
 	makeinfo --no-split -o $@ $<
 
-%.elc: %.el
-	$(CASK) exec $(BATCHC) $<
-
-README.md: el2markdown.el $(ELS)
-	$(CASK) exec $(BATCH) -l $< $(ELS) -f el2markdown-write-readme
+README.md: el2markdown.el $(SRCS)
+	$(CASK) exec $(EMACSBATCH) -l $< $(SRCS) -f el2markdown-write-readme
 
 el2markdown.el:
-	$(WGET) -q -O $@ "https://github.com/Lindydancer/el2markdown/raw/master/el2markdown.el"
+	$(CURL) -sSL -o $@ "https://github.com/Lindydancer/el2markdown/raw/master/el2markdown.el"
 
 .INTERMEDIATE: el2markdown.el
 
 clean:
-	$(RM) $(ELCS)
+	$(RM) $(OBJS)
 	$(RM) $(TEXI_DIST)
 	$(RM) $(INFO_DIST)
 	$(RM) $(PYTHON_VERSION).stamp
